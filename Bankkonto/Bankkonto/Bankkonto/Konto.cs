@@ -13,7 +13,7 @@ public enum KontoStatus
 public abstract class Konto : IKonto
 {
     public string KontoNummer { get; } = Guid.NewGuid().ToString();
-    public decimal Guthaben { get; protected set; }
+    public decimal Guthaben { get; protected set; } = 0m;
     public static decimal AktivZins { get; set; }
     public static decimal PassivZins { get; set; }
     public KontoStatus Status { get; set; }
@@ -98,7 +98,7 @@ public abstract class Konto : IKonto
 
     public virtual void Kontoabschliessen()
     {
-        if(IstGeschlossen)
+        if (IstGeschlossen)
         {
             throw new InvalidOperationException(
                 "Das Konto ist bereits abgeschlossen.");

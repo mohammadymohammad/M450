@@ -60,9 +60,8 @@ public class KontoTest
     void Kontoabschliessen_SetztGuthabenAufNull()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
-        konto.Einzahlen(500m);
-
+        decimal initialBalance = 0m;
+        var konto = new Bankkonto.Privatkonto(initialBalance, KontoStatus.Standard);
         // Act
         konto.Kontoabschliessen();
 
@@ -75,8 +74,6 @@ public class KontoTest
     {
         // Arrange
         var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
-        konto.Einzahlen(500m);
-
         // Act & Assert
         Assert.Throws<InvalidOperationException>(
             () => konto.Kontoabschliessen());
@@ -88,8 +85,6 @@ public class KontoTest
         // Arrange
         var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
         konto.IstGeschlossen = true;
-        konto.Kontoabschliessen();
-
         // Act & Assert
         Assert.Throws<InvalidOperationException>(
             () => konto.Kontoabschliessen());
@@ -99,10 +94,11 @@ public class KontoTest
     void Zinsgutschreibung_GuthabenUnter10000_VerwendetAktivZins()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
+        decimal initialBalance = 1000m;
+        var konto = new Bankkonto.Privatkonto(initialBalance, KontoStatus.Standard);
 
         konto.Status = KontoStatus.Standard;
-        konto.Einzahlen(5000m);
+        konto.Einzahlen(4000m);
 
         Bankkonto.Konto.AktivZins = 0.01m;
 

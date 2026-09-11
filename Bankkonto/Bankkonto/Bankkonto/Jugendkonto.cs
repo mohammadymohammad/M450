@@ -7,7 +7,7 @@ namespace Bankkonto;
 public class Jugendkonto : Konto
 {
     public KontoStatus Status { get; set; }
-    public override void Beziehen(decimal betrag)
+    public override void  Beziehen(decimal betrag)
     {
         if (betrag <= 0)
         {
