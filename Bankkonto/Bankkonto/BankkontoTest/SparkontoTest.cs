@@ -10,7 +10,7 @@ public class SparkontoTest
     void Sparkonto_Ueberziehung_NichtErlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Sparkonto();
+        var konto = new Bankkonto.Sparkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act & Assert
@@ -22,7 +22,7 @@ public class SparkontoTest
     void Sparkonto_Bezug_BisZumGuthaben_Erlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Sparkonto();
+        var konto = new Bankkonto.Sparkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act

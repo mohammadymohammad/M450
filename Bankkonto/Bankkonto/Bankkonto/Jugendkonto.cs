@@ -23,4 +23,15 @@ public class Jugendkonto : Konto
 
         Guthaben -= betrag;
     }
+
+    public Jugendkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
+    {
+        if (startGuthaben < 0)
+        {
+            throw new ArgumentException(
+                "Das Startguthaben darf nicht negativ sein.");
+        }
+        Guthaben = startGuthaben;
+        Status = status;
+    }
 }

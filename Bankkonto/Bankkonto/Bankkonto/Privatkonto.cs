@@ -6,12 +6,17 @@ namespace Bankkonto;
 
 public class Privatkonto : Konto
 {
-    public decimal MaximalerUeberziehungsbetrag { get; }
     public KontoStatus Status { get; set; }
 
-    public Privatkonto(decimal maximalerUeberziehungsbetrag)
+    public Privatkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
     {
-        MaximalerUeberziehungsbetrag = maximalerUeberziehungsbetrag;
+        if (startGuthaben < 0)
+        {
+            throw new ArgumentException(
+                "Das Startguthaben darf nicht negativ sein.");
+        }
+        Guthaben = startGuthaben;
+        Status = status;
     }
 
     public override void Beziehen(decimal betrag)
@@ -22,10 +27,10 @@ public class Privatkonto : Konto
                 "Der Betrag muss grösser als 0 sein.");
         }
 
-        if (Guthaben - betrag < -MaximalerUeberziehungsbetrag)
+        if (betrag > Guthaben)
         {
             throw new InvalidOperationException(
-                "Der maximale Überziehungsbetrag wurde überschritten.");
+                "Ein Privatkonto kann nicht überzogen werden.");
         }
 
         Guthaben -= betrag;

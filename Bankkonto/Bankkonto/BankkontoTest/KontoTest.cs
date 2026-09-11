@@ -11,7 +11,7 @@ public class KontoTest
     void KontoNummer_WirdAutomatischErstellt()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
 
         // Act
         var kontoNummer = konto.KontoNummer;
@@ -24,7 +24,7 @@ public class KontoTest
     void Einzahlen_100_ErhoetGuthabenUm100()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
         decimal initialBalance = konto.Guthaben;
 
         // Act
@@ -38,7 +38,7 @@ public class KontoTest
     void Einzahlen_0_WirftArgumentException()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
 
         // Act & Assert
         Assert.Throws<ArgumentException>(
@@ -49,7 +49,7 @@ public class KontoTest
     void Einzahlen_NegativerBetrag_WirftArgumentException()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
 
         // Act & Assert
         Assert.Throws<ArgumentException>(
@@ -60,7 +60,7 @@ public class KontoTest
     void Kontoabschliessen_SetztGuthabenAufNull()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
         konto.Einzahlen(500m);
 
         // Act
@@ -71,10 +71,35 @@ public class KontoTest
     }
 
     [Fact]
+    void Kontoabschliessen_WirftInvalidOperationException_WennGuthabenNichtNull()
+    {
+        // Arrange
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
+        konto.Einzahlen(500m);
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(
+            () => konto.Kontoabschliessen());
+    }
+
+    [Fact]
+    void Kontoabschliessen_WirftInvalidOperationException_WennKontoBereitsGeschlossen()
+    {
+        // Arrange
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
+        konto.IstGeschlossen = true;
+        konto.Kontoabschliessen();
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(
+            () => konto.Kontoabschliessen());
+    }
+
+    [Fact]
     void Zinsgutschreibung_GuthabenUnter10000_VerwendetAktivZins()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, KontoStatus.Standard);
 
         konto.Status = KontoStatus.Standard;
         konto.Einzahlen(5000m);

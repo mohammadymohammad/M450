@@ -7,6 +7,17 @@ namespace Bankkonto;
 public class Sparkonto : Konto
 {
     public KontoStatus Status { get; set; }
+
+    public Sparkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
+    {
+        if (startGuthaben < 0)
+        {
+            throw new ArgumentException(
+                "Das Startguthaben darf nicht negativ sein.");
+        }
+        Guthaben = startGuthaben;
+        Status = status;
+    }
     public override void Beziehen(decimal betrag)
     {
         if (betrag <= 0)

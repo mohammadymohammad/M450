@@ -17,6 +17,19 @@ public abstract class Konto : IKonto
     public static decimal AktivZins { get; set; }
     public static decimal PassivZins { get; set; }
     public KontoStatus Status { get; set; }
+    public bool IstGeschlossen { get; set; } = false;
+
+    public Konto(decimal startGuthaben, KontoStatus status)
+    {
+        if (startGuthaben < 0)
+        {
+            throw new ArgumentException(
+                "Das Startguthaben darf nicht negativ sein.");
+        }
+
+        Guthaben = startGuthaben;
+        Status = status;
+    }
 
     public virtual void Einzahlen(decimal betrag)
     {
@@ -85,6 +98,18 @@ public abstract class Konto : IKonto
 
     public virtual void Kontoabschliessen()
     {
-        Guthaben = 0;
+        if(IstGeschlossen)
+        {
+            throw new InvalidOperationException(
+                "Das Konto ist bereits abgeschlossen.");
+        }
+        
+        if (Guthaben != 0)
+        {
+            throw new InvalidOperationException(
+                "Das Konto kann nur abgeschlossen werden, wenn das Guthaben 0 ist.");
+        }
+
+        IstGeschlossen = true;
     }
 }

@@ -10,7 +10,7 @@ public class JugendkontoTest
     void Jugendkonto_Ueberziehung_NichtErlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Jugendkonto();
+        var konto = new Bankkonto.Jugendkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act & Assert
@@ -22,7 +22,7 @@ public class JugendkontoTest
     void Jugendkonto_Bezug_BisZumGuthaben_Erlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Jugendkonto();
+        var konto = new Bankkonto.Jugendkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act

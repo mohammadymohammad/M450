@@ -10,7 +10,7 @@ public class PrivatkontoTest
     void Privatkonto_Ueberziehung_BisZumLimit_Erlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act
@@ -24,7 +24,7 @@ public class PrivatkontoTest
     void Privatkonto_Ueberziehung_UeberLimit_NichtErlaubt()
     {
         // Arrange
-        var konto = new Bankkonto.Privatkonto(1000m);
+        var konto = new Bankkonto.Privatkonto(1000m, Bankkonto.KontoStatus.Standard);
         konto.Einzahlen(100m);
 
         // Act & Assert
