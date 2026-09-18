@@ -6,17 +6,21 @@ namespace Bankkonto;
 
 public class Sparkonto : Konto
 {
-    public KontoStatus Status { get; set; }
-
-    public Sparkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
+    public Sparkonto(KontoArt kontoArt = KontoArt.Standard) : base(kontoArt)
+    {
+        KontoArt = kontoArt;
+    }
+    public Sparkonto(decimal startGuthaben, KontoArt kontoArt) : base(startGuthaben, kontoArt)
     {
         if (startGuthaben < 0)
         {
             throw new ArgumentException(
                 "Das Startguthaben darf nicht negativ sein.");
         }
+
+        Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
-        Status = status;
+        KontoArt = kontoArt;
     }
     public override void Beziehen(decimal betrag)
     {
@@ -32,6 +36,7 @@ public class Sparkonto : Konto
                 "Ein Sparkonto kann nicht überzogen werden.");
         }
 
+        Transaktionsdatum = DateTime.Now;
         Guthaben -= betrag;
     }
 }

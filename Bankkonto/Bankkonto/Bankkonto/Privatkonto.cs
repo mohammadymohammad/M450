@@ -6,17 +6,21 @@ namespace Bankkonto;
 
 public class Privatkonto : Konto
 {
-    public KontoStatus Status { get; set; }
-
-    public Privatkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
+    public Privatkonto(KontoArt kontoArt = KontoArt.Standard) : base(kontoArt)
+    {
+        KontoArt = kontoArt;
+    }
+    public Privatkonto(decimal startGuthaben, KontoArt kontoArt) : base(startGuthaben, kontoArt)
     {
         if (startGuthaben < 0)
         {
             throw new ArgumentException(
                 "Das Startguthaben darf nicht negativ sein.");
         }
+
+        Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
-        Status = status;
+        KontoArt = kontoArt;
     }
 
     public override void Beziehen(decimal betrag)
@@ -33,6 +37,7 @@ public class Privatkonto : Konto
                 "Ein Privatkonto kann nicht überzogen werden.");
         }
 
+        Transaktionsdatum = DateTime.Now;
         Guthaben -= betrag;
     }
 }

@@ -6,7 +6,6 @@ namespace Bankkonto;
 
 public class Jugendkonto : Konto
 {
-    public KontoStatus Status { get; set; }
     public override void  Beziehen(decimal betrag)
     {
         if (betrag <= 0)
@@ -21,17 +20,25 @@ public class Jugendkonto : Konto
                 "Ein Jugendkonto kann nicht überzogen werden.");
         }
 
+        Transaktionsdatum = DateTime.Now;
         Guthaben -= betrag;
     }
 
-    public Jugendkonto(decimal startGuthaben, KontoStatus status) : base(startGuthaben, status)
+    public Jugendkonto(KontoArt kontoArt = KontoArt.Standard) : base(kontoArt) 
+    {
+        KontoArt = kontoArt;
+    }
+
+    public Jugendkonto(decimal startGuthaben, KontoArt kontoArt) : base(startGuthaben, kontoArt)
     {
         if (startGuthaben < 0)
         {
             throw new ArgumentException(
                 "Das Startguthaben darf nicht negativ sein.");
         }
+
+        Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
-        Status = status;
+        KontoArt = kontoArt;
     }
 }

@@ -4,44 +4,46 @@ using System.Text;
 
 namespace BankkontoTest;
 
+[TestClass]
 public class JugendkontoTest
 {
-    [Fact]
-    void Jugendkonto_Ueberziehung_NichtErlaubt()
+    [TestMethod]
+    public void Jugendkonto_Ueberziehung_NichtErlaubt()
     {
         // Arrange
-        decimal initialBalance = 1000m;
-        var konto = new Bankkonto.Jugendkonto(initialBalance, Bankkonto.KontoStatus.Standard);
+        decimal blance = 1000m;
+        decimal withdraw = 1001m;
+        var konto = new Bankkonto.Jugendkonto(blance, Bankkonto.KontoArt.Standard);
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(
-            () => konto.Beziehen(1001m));
+            () => konto.Beziehen(withdraw));
     }
 
-    [Fact]
-    void Jugendkonto_Ueberziehung_UeberLimit_NichtErlaubt()
+    [TestMethod]
+    public void Jugendkonto_Ueberziehung_UeberLimit_NichtErlaubt()
     {
         // Arrange
         decimal initialBalance = 1000m;
         decimal withdrawalAmount = 0m;
-        var konto = new Bankkonto.Jugendkonto(initialBalance, Bankkonto.KontoStatus.Standard);
+        var konto = new Bankkonto.Jugendkonto(initialBalance, Bankkonto.KontoArt.Standard);
 
         // Act & Assert
         Assert.Throws<ArgumentException>(
             () => konto.Beziehen(withdrawalAmount));
     }
 
-    [Fact]
-    void Jugendkonto_Bezug_BisZumGuthaben_Erlaubt()
+    [TestMethod]
+    public void Jugendkonto_Bezug_BisZumGuthaben_Erlaubt()
     {
         // Arrange
         decimal initialBalance = 1000m;
-        var konto = new Bankkonto.Jugendkonto(initialBalance, Bankkonto.KontoStatus.Standard);
+        var konto = new Bankkonto.Jugendkonto(initialBalance, Bankkonto.KontoArt.Standard);
 
         // Act
-        konto.Beziehen(100m);
+        konto.Beziehen(1000m);
 
         // Assert
-        Assert.Equal(900m, konto.Guthaben);
+        Assert.AreEqual(0m, konto.Guthaben);
     }
 }

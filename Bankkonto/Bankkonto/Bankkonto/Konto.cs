@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Bankkonto;
 
-public enum KontoStatus
+public enum KontoArt
 {
     VIP,
     Standard,
@@ -12,14 +12,25 @@ public enum KontoStatus
 
 public abstract class Konto : IKonto
 {
+    public const decimal MinimaleStandardBezugslimite = 0m;
+    public const decimal MaximaleStandardBezugslimite = 10_000m;
     public string KontoNummer { get; } = Guid.NewGuid().ToString();
     public decimal Guthaben { get; protected set; } = 0m;
+    public decimal Bezugslimite { get; private set; }
+    public DateTime BezugslimiteGueltigAb { get; private set; }
     public static decimal AktivZins { get; set; }
     public static decimal PassivZins { get; set; }
-    public KontoStatus Status { get; set; }
+    public KontoArt KontoArt { get; set; }
+    public DateTime Eroeffnungsdatum { get; set; }
+    public DateTime Abschlussdatum { get; set; }
+    public DateTime Transaktionsdatum { get; set; }
     public bool IstGeschlossen { get; set; } = false;
 
-    public Konto(decimal startGuthaben, KontoStatus status)
+    public Konto(KontoArt kontoArt = KontoArt.Standard) 
+    { 
+        KontoArt = kontoArt;
+    }
+    public Konto(decimal startGuthaben, KontoArt kontoArt)
     {
         if (startGuthaben < 0)
         {
@@ -27,8 +38,9 @@ public abstract class Konto : IKonto
                 "Das Startguthaben darf nicht negativ sein.");
         }
 
+        Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
-        Status = status;
+        KontoArt = kontoArt;
     }
 
     public virtual void Einzahlen(decimal betrag)
@@ -39,10 +51,25 @@ public abstract class Konto : IKonto
                 "Der Betrag muss grösser als 0 sein.");
         }
 
+        Transaktionsdatum = DateTime.Now;
         Guthaben += betrag;
     }
 
     public abstract void Beziehen(decimal betrag);
+
+    public void setzeBezugslimite(decimal neueBezugslimite, DateTime gueltigAb)
+    {
+        if (neueBezugslimite < MinimaleStandardBezugslimite ||
+            neueBezugslimite > MaximaleStandardBezugslimite)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(neueBezugslimite),
+                "Die Bezugslimite muss innerhalb der Standardlimiten liegen.");
+        }
+
+        Bezugslimite = neueBezugslimite;
+        BezugslimiteGueltigAb = gueltigAb;
+    }
 
     public virtual void Transferieren(IKonto konto, decimal betrag)
     {
@@ -57,6 +84,7 @@ public abstract class Konto : IKonto
                 "Der Betrag muss grösser als 0 sein.");
         }
 
+        Transaktionsdatum = DateTime.Now;
         Beziehen(betrag);
         konto.Einzahlen(betrag);
     }
@@ -73,9 +101,9 @@ public abstract class Konto : IKonto
         {
             zinssatz = AktivZins + 0.005m;
         }
-        else if (Guthaben >= 50_000m && Guthaben < 100_000m)
+        else // Grösser als 50_000.
         {
-            if (Status == KontoStatus.VIP)
+            if (KontoArt == KontoArt.VIP)
             {
                 zinssatz = AktivZins + 0.015m;
             }
@@ -84,15 +112,12 @@ public abstract class Konto : IKonto
                 zinssatz = AktivZins + 0.0075m;
             }
         }
-        else
-        {
-            return;
-        }
 
         decimal zins = Guthaben * zinssatz * anzahlTage / 365m;
 
         zins = Math.Round(zins, 2);
 
+        Transaktionsdatum = DateTime.Now;
         Guthaben += zins;
     }
 
@@ -110,6 +135,7 @@ public abstract class Konto : IKonto
                 "Das Konto kann nur abgeschlossen werden, wenn das Guthaben 0 ist.");
         }
 
+        Abschlussdatum = DateTime.Now;
         IstGeschlossen = true;
     }
 }
