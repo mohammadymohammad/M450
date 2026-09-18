@@ -84,8 +84,8 @@ public class KontoTest
     }
 
     [TestMethod]
-    [DataRow(-1)]
-    [DataRow(10001)]
+    [DataRow(-1, DisplayName = "Bezugslimite weniger als Standardlimiten")]
+    [DataRow(10001, DisplayName = "Bezugslimite über den Standardlimiten")]
     public void SetzeBezugslimite_AusserhalbDerStandardlimiten_WirftException(double bezugslimite)
     {
         var konto = new Bankkonto.Privatkonto(1000m, KontoArt.Standard);

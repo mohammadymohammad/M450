@@ -32,11 +32,7 @@ public abstract class Konto : IKonto
     }
     public Konto(decimal startGuthaben, KontoArt kontoArt)
     {
-        if (startGuthaben < 0)
-        {
-            throw new ArgumentException(
-                "Das Startguthaben darf nicht negativ sein.");
-        }
+        PruefeStartguthaben(startGuthaben);
 
         Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
@@ -45,17 +41,27 @@ public abstract class Konto : IKonto
 
     public virtual void Einzahlen(decimal betrag)
     {
-        if (betrag <= 0)
-        {
-            throw new ArgumentException(
-                "Der Betrag muss grösser als 0 sein.");
-        }
+        PruefeBetrag(betrag);
 
         Transaktionsdatum = DateTime.Now;
         Guthaben += betrag;
     }
 
-    public abstract void Beziehen(decimal betrag);
+    public void Beziehen(decimal betrag)
+    {
+        PruefeBetrag(betrag);
+        BeziehenIntern(betrag);
+    }
+
+    protected abstract void BeziehenIntern(decimal betrag);
+
+    protected void PruefeGuthaben(decimal betrag, string fehlermeldung)
+    {
+        if (betrag > Guthaben)
+        {
+            throw new InvalidOperationException(fehlermeldung);
+        }
+    }
 
     public void setzeBezugslimite(decimal neueBezugslimite, DateTime gueltigAb)
     {
@@ -78,15 +84,29 @@ public abstract class Konto : IKonto
             throw new ArgumentNullException(nameof(konto));
         }
 
+        PruefeBetrag(betrag);
+
+        Transaktionsdatum = DateTime.Now;
+        Beziehen(betrag);
+        konto.Einzahlen(betrag);
+    }
+
+    private static void PruefeBetrag(decimal betrag)
+    {
         if (betrag <= 0)
         {
             throw new ArgumentException(
                 "Der Betrag muss grösser als 0 sein.");
         }
+    }
 
-        Transaktionsdatum = DateTime.Now;
-        Beziehen(betrag);
-        konto.Einzahlen(betrag);
+    private static void PruefeStartguthaben(decimal startGuthaben)
+    {
+        if (startGuthaben < 0)
+        {
+            throw new ArgumentException(
+                "Das Startguthaben darf nicht negativ sein.");
+        }
     }
 
     public virtual void Zinsgutschreibung(int anzahlTage)
