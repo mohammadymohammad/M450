@@ -6,6 +6,24 @@ using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace BankkontoTest;
 
+public class ThrowingKonto : Bankkonto.Konto
+{
+    public ThrowingKonto(decimal startGuthaben, KontoArt kontoArt) : base(startGuthaben, kontoArt)
+    {
+    }
+
+    public override void Einzahlen(decimal betrag)
+    {
+        throw new InvalidOperationException("Zielkonto lehnt Einzahlung ab.");
+    }
+
+    protected override void BeziehenIntern(decimal betrag)
+    {
+        PruefeGuthaben(betrag, "Ein ThrowingKonto kann nicht überzogen werden.");
+        Guthaben -= betrag;
+    }
+}
+
 [TestClass]
 public class KontoTest
 {
@@ -126,6 +144,19 @@ public class KontoTest
         // Act & Assert
         Assert.Throws<InvalidOperationException>(
             () => konto.Kontoabschliessen());
+    }
+
+    [TestMethod]
+    public void Transferieren_WennZielEinzahlungScheitert_WirdQuelleNichtVerändert()
+    {
+        // Arrange
+        var quelle = new Bankkonto.Privatkonto(1000m, KontoArt.Standard);
+        var ziel = new ThrowingKonto(500m, KontoArt.Standard);
+
+        // Act & Assert
+        Assert.ThrowsException<InvalidOperationException>(() => quelle.Transferieren(ziel, 200m));
+        Assert.AreEqual(1000m, quelle.Guthaben);
+        Assert.AreEqual(500m, ziel.Guthaben);
     }
 
     [TestMethod]

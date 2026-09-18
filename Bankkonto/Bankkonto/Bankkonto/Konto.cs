@@ -26,17 +26,17 @@ public abstract class Konto : IKonto
     public DateTime Transaktionsdatum { get; set; }
     public bool IstGeschlossen { get; set; } = false;
 
-    public Konto(KontoArt kontoArt = KontoArt.Standard) 
-    { 
+    protected Konto(KontoArt kontoArt = KontoArt.Standard)
+    {
         KontoArt = kontoArt;
+        Eroeffnungsdatum = DateTime.Now;
     }
-    public Konto(decimal startGuthaben, KontoArt kontoArt)
+
+    protected Konto(decimal startGuthaben, KontoArt kontoArt)
+        : this(kontoArt)
     {
         PruefeStartguthaben(startGuthaben);
-
-        Eroeffnungsdatum = DateTime.Now;
         Guthaben = startGuthaben;
-        KontoArt = kontoArt;
     }
 
     public virtual void Einzahlen(decimal betrag)
@@ -86,9 +86,24 @@ public abstract class Konto : IKonto
 
         PruefeBetrag(betrag);
 
+        if (konto == this)
+        {
+            throw new InvalidOperationException("Ein Konto kann nicht an sich selbst übertragen.");
+        }
+
+        var originalGuthaben = Guthaben;
+        try
+        {
+            konto.Einzahlen(betrag);
+            Beziehen(betrag);
+        }
+        catch
+        {
+            Guthaben = originalGuthaben;
+            throw;
+        }
+
         Transaktionsdatum = DateTime.Now;
-        Beziehen(betrag);
-        konto.Einzahlen(betrag);
     }
 
     private static void PruefeBetrag(decimal betrag)
